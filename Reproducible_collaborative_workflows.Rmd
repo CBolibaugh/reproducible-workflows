@@ -6,7 +6,14 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
+library(tidyverse)
+# remotes::install_github("ekothe/trackdown",build_vignettes = TRUE)
+# library(trackdown)
+
 ```
 
 ### Setting up a reproducible and collaborative workflow
@@ -17,22 +24,22 @@ I'll try to document both parts of this workflow. Part I is setting a repository
 
 I have written this post directly in Rmarkdown.
 
-#### Part I 
+#### Part I
 
-##### Resources 
+##### Resources
 
-#####       <https://cfss.uchicago.edu/setup/git-with-rstudio/>
+##### <https://cfss.uchicago.edu/setup/git-with-rstudio/>
 
-1) Create a new project repository
+1)  Create a new project repository
 
 As a first step, I've followed the instructions above (I already have Git set up and linked to RStudio, and a Github account), and created a new repository that I titled reproducible-workflows. I then started a new project locally by cloning the repository, edited the read-me and pushed it back to check everything was working.
 
-2) Create a new rmarkdown file, and add some code.
+2)  Create a new rmarkdown file, and add some code.
 
 This workflow assumes that we are going to use to Git to keep track of code changes. As an example, here is some simulated data from a fake study.
 
+#### Fake study report
 
-##### Fake study report
 Research has shown that spending time with a pet appeared to act as a buffer against psychological stress (Ratschen et al., 2020). Imagine that we conducted an experiment to explore whether this effect generalised to stress caused by university exams. Specifically, we hypothesised that spending time with a university health and wellbeing dog before an exam would reduce feelings of stress relative to those who only looked at pictures of dogs before an exam. In order to test the hypothesis we recruited 200 students who had imminent exams and declared that they felt stressed, and assigned half of them to pet the university dog, and half to look through a catalogue of dog pictures. We then assessed how stressed they felt on the Stress-o-metre Scale (1-100).
 
 For the purposes of this simulation, we have a simple between subjects design, where the independent (grouping) variable has two levels, and the dependent variable is from a normal distribution.
@@ -48,6 +55,7 @@ n2 <- 100 #how many participants group B?
 sigma1 <- 20 #population standard deviation of condition A?
 sigma2 <- 20 #population standard deviation of condition B?
 ```
+
 We then generate the scores using the `rnorm()` function, then plot the distribution of scores for each group.
 
 ```{r ind-dat, echo=TRUE}
@@ -63,4 +71,135 @@ hist(A_scores)
 hist(B_scores)
 ```
 
-Ratschen E, Shoesmith E, Shahab L, Silva K, Kale D, Toner P, et al. (2020) Human-animal relationships and interactions during the Covid-19 lockdown phase in the UK: Investigating links with mental health and loneliness. PLoS ONE 15(9): e0239397. https://doi.org/10.1371/journal.pone.0239397
+I can now run my inferential test on my new data.
+
+```{r t-test1}
+t.test(A_scores,B_scores)
+```
+
+But we want to report the results from the statistical test in an inline report (i.e. a sentence), so we assign it to an object and extract the parameters we need in text:
+
+```{r t-test2}
+mod1 <- broom::tidy(t.test(A_scores,B_scores))
+```
+
+A `` `r mod1$method` `` indicated that participants in condition A (*M* = `` `r mean(A_scores)` ``, *SD* = `` `r sd(A_scores)` ``) did [not] score significantly lower than participants in condition B (*M* = `` `r mean(B_scores)` ``, *SD* = `` `r  sd(B_scores)` ``), *t*(`` `r mod1$parameter` ``) = `` `r mod1$statistic` ``, *p* = `` `r mod1$p.value` ``.
+
+This will print out as follows:
+
+> A `r mod1$method` indicated that participants in condition A (*M* = `r mean(A_scores)`, *SD* = `r sd(A_scores)`) did [not] score significantly lower than participants in condition B (*M* =`r mean(B_scores)`, *SD* = `r sd(B_scores)`), *t*(`r mod1$parameter`) = `r mod1$statistic`, *p* = `r mod1$p.value`.
+
+Unfortunately, the number of digits isn't helpful. The `round` function can help:
+
+> A `r mod1$method` indicated that participants in condition A (*M* = `r round(mean(A_scores),2)`, *SD* = `r round(sd(A_scores),2)`) did [not] score significantly lower than participants in condition B (*M* = `r round(mean(B_scores),2)`, *SD* = `r round(sd(B_scores),2)`), *t*(`r round(mod1$parameter,2)`) = `r round(mod1$statistic,2)`, *p* = `r round(mod1$p.value,2)`.
+
+Once I have finished my analysis and pushed the changes, I am going to share these exciting results with my (imaginary) collaborators so that we can craft the discussion section of our paper together. This is where Part II of the reproducible, collaborative workflow and the `trackdown` package comes in.
+
+#### Part II
+
+##### Resources
+
+The vignettes for the `trackdown` package can be found here: <https://ekothe.github.io/trackdown/>
+
+[Working in RStudio to create a new Google Doc]{.ul}
+
+The `trackdown` package isn't on CRAN yet, and so needs to be installed directly:
+
+`remotes::install_github("ekothe/trackdown",build_vignettes = TRUE)`
+
+Following the workflow vignette, I now use the `upload_file()` function to create a Google doc in my Google Drive from the present Rmarkdown file. I have followed their suggestion to hide the code so that collaborators don't accidentally overwrite anything they don't understand when we are creating the narrative portion of the text, but I can imagine circumstances (working with my own PhDs) where I wouldn't want to do this.
+
+> trackdown::update_file(file = "Path-to-file/My-Report.Rmd", hide_code = TRUE)
+
+Reading the documentation for the `upload_file()` function tells us that we want to specify the file (path of the local. Rmd), and there are further arguments that I won't change for now.
+
+Running the `upload_file()` function for the first time, I see a dialogue that requests permission for caching OAuth access credentials in a folder between sessions. I am not sure about this, but will say yes given this is not a sensitive file.
+
+> `→ Is it OK to cache OAuth access credentials in the folder ~/Library/Caches/gargle between R sessions?`
+
+Once I execute the command, I am then prompted (in a new browser tab -- note that I was signed in to gmail at the time) to choose which Google account I wanted to use, and to grant access to the Tidy... API.
+
+Once granted, I receive a further prompt asking if I want to create the `trackdown` folder in my Drive:
+
+> `Folder ‘trackdown/’ does not exists in GoogleDrive. Do you want to create it?`
+
+An important note is that you probably *don't* want to specify the `upload_file()` function as a code chunk that will be run whenever you knit the document. Doing so caused an error when I knit, so best to run in the console.
+
+So far, so good. Now let's go to Google Drive and see what's there.
+
+[Working in Google Drive]{.ul}
+
+Opening my Drive, I see that my new document (with the same name as the .Rmd) is the first item suggested to me (since it is the most recently created document).
+
+Unfortunately, I spot my first problem. During the process of creating the Google Doc, I recorded the various queries and warnings as they appeared in the .Rmd itself. Unsurprisingly, the Google Doc doesn't contain any of the text that I wrote after the evaluation of the `upload_file()` function. The next step should inform me how the `trackdown` package resolves conflicts.
+
+A few points to note first. The new Google Doc has the same title as the .rmd, and because I've chosen to hide the code, any *code chunks* are hidden. However, since I used in-text reporting of the results of my analysis, these are still there, and could potentially be confusing to a non-r-literate collaborator.
+
+Another important note, is that `trackdown` adds a commentary at the top of the document to inform the readers that this is a rather *special* type of document. If a collaborator reads these carefully, they *might* be less likely to pepper me with questions:
+
+> ----Trackdown Instructions---- This is not a common Document. The Document includes properly formatted Markdown syntax and R code. Please be aware and responsible in making corrections as you could break the code. Limit changes to narrative text and avoid modifying R code. Please do not remove placeholders of type "[[chunk-<name>]]" or "[[document-header]]" Once the review is over accept all changes: Tools -\> Review suggested edits -\> Accept all. You must not modify or remove these lines, we will do it for you ;) FILE-NAME: Reproducible_collaborative_workflows.Rmd HIDE-CODE: TRUE ----End Instructions----
+
+If I were sharing with a collaborator, this would be the point at which I would share the link. An important point to note is that any changes made to the document in Suggestion Mode, and any comments, need to be accepted before the document is reconciled with the local .Rmd.
+
+Since I don't have a collaborator other than myself at the moment, let's download the Google Doc back into Rmd format and see whether/how conflicts are resolved.
+
+Looking at the `download_file()` function vignette (<https://ekothe.github.io/trackdown/reference/download_file.html>), I find the answer to my question:
+
+> Use with caution as local version of the file will be overwritten!
+
+So in preparation for downloading, I copy the excess text that I worked on into another .rmd. Hopefully I won't make this mistake again. The bottom line is that merge conflicts are not elegantly dealt with, so it pays to be clear which document is active or 'live' at any point.
+
+Rather than hard coding the download command into my script, I will run it from the console (although it might be better to put it in and comment it out in order to keep track of the points at which the document changed).
+
+> `trackdown::download_file(file = "Path-to-file/My-Report.Rmd")`
+
+After running this in the console, I am duly warned that downloading will overwrite my local file, and have to confirm that I want to do this. Once I agree I am prompted to reload my file and ta-da, the text I wrote in Google Docs is now in my .Rmd document.
+
+Having learned my lesson the hard way, I'll now copy back in the notes from my local copy that I have saved once I knew they would be overwritten, and knit the document to see what it looks like.
+
+To finish off, I'll add some more code, and push the latest version back to Github.
+
+#### Fake Study Report II
+
+As can be seen in Figure 3, our results indicate that spending time petting the university health and well being dog did not significantly reduce stress relative to looking at pictures of dogs prior to an exam. The study will need to be replicated with other dogs as stimuli.
+
+```{r wide dog, include=FALSE}
+#join scores in a tibble
+stress_wide <- tibble(
+  pet_dog = A_scores,
+  pic_dog = B_scores
+)
+```
+
+```{r long dog, include=FALSE}
+#pivot to long format and add id
+stress_long <- pivot_longer(
+  data = stress_wide,
+  cols = c("pet_dog", "pic_dog"),
+  names_to = "Condition",
+  values_to = "Score"
+) %>% mutate(
+  user_id = paste0("S", seq(200))
+)
+```
+
+*Figure 3.* Stress after either petting dog or looking at dog pictures
+
+```{r dog plot, echo=FALSE}
+ papaja::apa_beeplot(stress_long
+                     , dv = "Score"
+                     , factors = "Condition"
+                     , id = "user_id"
+                     , args_x_axis = list(labels = c("Pet Dog", "Dog Picture"))
+                     , ylab = "Stress-O-Metre Score"
+                       )
+
+```
+
+### Comments
+
+The process works, but not painlessly. It will likely require some more "clued-up" collaborators, since the Google Doc contains all of the Markdown formatting. It might be better to render the document to another format for them to be able to see what it looks like. This is possible.
+
+A great feature would be the ability to compare the text of documents
+
+Ratschen E, Shoesmith E, Shahab L, Silva K, Kale D, Toner P, et al. (2020) Human-animal relationships and interactions during the Covid-19 lockdown phase in the UK: Investigating links with mental health and loneliness. PLoS ONE 15(9): e0239397. <https://doi.org/10.1371/journal.pone.0239397>
