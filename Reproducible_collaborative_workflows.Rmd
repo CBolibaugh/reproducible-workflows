@@ -1,0 +1,30 @@
+---
+title: "Reproducible and collaborative workflows"
+author: "Cylcia Bolibaugh"
+date: "01/07/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Setting up a reproducible and collaborative workflow
+
+I want to formalise my working practices so that I can share them with my PhDs and other interested colleagues. My two main goals are 1) making better use of version control for the code in my analyses, and 2) finding a sustainable way to collaborate with others who may not be familiar with R and Rmarkdown when writing, using Google Docs.
+
+I'll try to document both parts of this. Part I is setting a repository for new projects on Github, and part II is making use of the new [trackdown package](https://ekothe.github.io/trackdown/articles/trackdown-workflow.html)
+
+I have written this post directly in Rmarkdown.
+
+#### Part I 
+
+##### Resources 
+
+#####       <https://cfss.uchicago.edu/setup/git-with-rstudio/>
+
+1) Create a new project repository
+
+As a first step, I've followed the instructions above (I already have Git set up and linked to RStudio, and a Github account), and created a new repository that I titled reproducible-workflows. I then started a new project locally by cloning the repository, edited the read-me and pushed it back to check everything was working.
+
+2) Create a new rmarkdown file, and add some code.
