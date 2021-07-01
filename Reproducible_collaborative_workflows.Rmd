@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 I want to formalise my working practices so that I can share them with my PhDs and other interested colleagues. My two main goals are 1) making better use of version control for the code in my analyses, and 2) finding a sustainable way to collaborate with others who may not be familiar with R and Rmarkdown when writing, using Google Docs.
 
-I'll try to document both parts of this. Part I is setting a repository for new projects on Github, and part II is making use of the new [trackdown package](https://ekothe.github.io/trackdown/articles/trackdown-workflow.html)
+I'll try to document both parts of this workflow. Part I is setting a repository for new projects on Github, and Part II is making use of the new [trackdown package](https://ekothe.github.io/trackdown/articles/trackdown-workflow.html)
 
 I have written this post directly in Rmarkdown.
 
@@ -28,3 +28,39 @@ I have written this post directly in Rmarkdown.
 As a first step, I've followed the instructions above (I already have Git set up and linked to RStudio, and a Github account), and created a new repository that I titled reproducible-workflows. I then started a new project locally by cloning the repository, edited the read-me and pushed it back to check everything was working.
 
 2) Create a new rmarkdown file, and add some code.
+
+This workflow assumes that we are going to use to Git to keep track of code changes. As an example, here is some simulated data from a fake study.
+
+
+##### Fake study report
+Research has shown that spending time with a pet appeared to act as a buffer against psychological stress (Ratschen et al., 2020). Imagine that we conducted an experiment to explore whether this effect generalised to stress caused by university exams. Specifically, we hypothesised that spending time with a university health and wellbeing dog before an exam would reduce feelings of stress relative to those who only looked at pictures of dogs before an exam. In order to test the hypothesis we recruited 200 students who had imminent exams and declared that they felt stressed, and assigned half of them to pet the university dog, and half to look through a catalogue of dog pictures. We then assessed how stressed they felt on the Stress-o-metre Scale (1-100).
+
+For the purposes of this simulation, we have a simple between subjects design, where the independent (grouping) variable has two levels, and the dependent variable is from a normal distribution.
+
+```{r ind-vars, echo = TRUE}
+#simulate normally distributed data for an independent samples t-test
+muA <- 50 #what's the population mean for condition A?
+muB <- 55 #what's the population mean for condition B?
+
+n1 <- 100 #how many participants group A?
+n2 <- 100 #how many participants group B?
+
+sigma1 <- 20 #population standard deviation of condition A?
+sigma2 <- 20 #population standard deviation of condition B?
+```
+We then generate the scores using the `rnorm()` function, then plot the distribution of scores for each group.
+
+```{r ind-dat, echo=TRUE}
+A_scores <- rnorm(n1,muA,sigma1) #simulate a vector of 100 deviates from normal distribution
+B_scores <- rnorm(n2,muB,sigma2) #simulate a vector of 100 deviates from normal distribution
+```
+
+```{r histA, fig.cap = "Figure 1: Distribution of scores from Group A"}
+hist(A_scores)
+```
+
+```{r histB, fig.cap = "Figure 2: Distribution of scores from Group B"}
+hist(B_scores)
+```
+
+Ratschen E, Shoesmith E, Shahab L, Silva K, Kale D, Toner P, et al. (2020) Human-animal relationships and interactions during the Covid-19 lockdown phase in the UK: Investigating links with mental health and loneliness. PLoS ONE 15(9): e0239397. https://doi.org/10.1371/journal.pone.0239397
