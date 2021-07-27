@@ -13,7 +13,6 @@ author:
       - Writing - Original Draft Preparation
       - Writing - Review & Editing
 
-
 affiliation:
   - id            : "1"
     institution   : "University of York"
@@ -66,7 +65,6 @@ In order to test the hypothesis we recruited 200 students who had imminent exams
 
 # Methods
 
-
 ## Participants
 We recruited two hundred undergraduate students. All students were screened to ensure that they planned to sit an exam within the next 5 days, and that they reported feeling stressed.
 
@@ -91,7 +89,6 @@ conditions <- plot_grid(live_dog, book_dog, ncol = 2, labels = c("Live dog", "Do
 conditions
 ```
 
-
 ## Procedure
 Our imaginary students were randomly assigned into the "Live Dog" condition or the "Dog Pictures" condition. Each participant sat the intervention and test individually. They spent 5 minutes either petting the dog, or looking at dog pictures. They then completed the Stress-o-Metre self-assessment in a quiet room.
 
@@ -114,7 +111,6 @@ sigma1 <- 20 #population standard deviation of condition A?
 sigma2 <- 20 #population standard deviation of condition B?
 ```
 
-
 ```{r ind-dat, echo=TRUE}
 # Generate the scores using the `rnorm()` function, then plot the distribution of scores for each group.
 
@@ -133,9 +129,7 @@ hist(A_scores)
 hist(B_scores)
 ```
 
-
 We used `r cite_r("r-references.bib")` for all our analyses.
-
 
 # Results
 
@@ -146,7 +140,6 @@ We used `r cite_r("r-references.bib")` for all our analyses.
 t.test(A_scores,B_scores)
 ```
 
-
 ```{r t-test2}
 # We want to report the results from the statistical test in an inline report (i.e. a sentence), so we assign it to an object and extract the parameters we need in text:
 
@@ -156,7 +149,8 @@ A `r mod1$method` indicated that participants who pet dogs (*M* = `r round(mean(
 
 # Discussion
 
-This is a poorly designed study with multiple confounds.
+This is a poorly designed study with multiple confounds. In future research, the materials and intervention will need to be validated, and the Stress-O-Metre’s reliability established. The design would benefit from a pre-test as well.
+
 \newpage
 
 # References
@@ -167,3 +161,37 @@ This is a poorly designed study with multiple confounds.
 
 <div id="refs" custom-style="Bibliography"></div>
 \endgroup
+
+```{r track-uoload, eval=FALSE, include=FALSE}
+# trackdown package to create google doc for collaboration
+
+upload_file(
+  file = "Benefits of petting dogs.Rmd",
+  gfile = NULL,
+  gpath = "trackdown",
+  shared_drive = NULL,
+  hide_code = TRUE,
+  path_output = "Benefits-of-petting-dogs.docx"
+)
+```
+```{r track-update, eval=FALSE, include=FALSE}
+# trackdown package to create google doc for collaboration
+
+update_file(
+  file = "Benefits of petting dogs.Rmd",
+  gfile = NULL,
+  gpath = "trackdown",
+  shared_drive = NULL,
+  hide_code = TRUE,
+  path_output = "Benefits-of-petting-dogs.docx"
+)
+```
+```{r track-down, eval=FALSE, include=FALSE}
+trackdown::download_file(
+  file = "Benefits of petting dogs.Rmd",
+  gfile = NULL, 
+  gpath = "trackdown", 
+  shared_drive = NULL)
+
+
+```
