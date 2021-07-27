@@ -18,31 +18,46 @@ library(tidyverse)
 
 ### Setting up a reproducible and collaborative workflow
 
-I want to formalise my working practices so that I can share them with my PhDs and other interested colleagues. My two main goals are 1) making better use of version control for the code in my analyses, and 2) finding a sustainable way to collaborate with others who may not be familiar with R and Rmarkdown when writing, using Google Docs.
+I want to formalise (and document) my working practices so that I can share them with my PhDs and other interested colleagues. My two main goals are 1) making better and more frequent use of version control for the code in my analyses, and 2) finding a sustainable way to collaborate with others who may not be familiar with R and Rmarkdown when writing, specifically using Google Docs.
 
-I'll try to document both parts of this workflow. Part I is setting a repository for new projects on Github, and Part II is making use of the new [trackdown package](https://ekothe.github.io/trackdown/articles/trackdown-workflow.html)
+I aim to document both parts of this workflow through the writing of this post. Part I consists of setting up a repository for new projects on Github, and Part II involves making use of the new [trackdown package](https://ekothe.github.io/trackdown/articles/trackdown-workflow.html) to generate a Google Doc from an Rmarkdown document, which can then be shared with collaborators.
 
-I have written this post directly in Rmarkdown.
+To test the whole workflow, I intersperse my comments on the *process* with a sample report of a fake study.
 
-#### Part I
+The idea of documenting my process is drawn (as many things are) from Jenny Bryan, and [Stat545](https://stat545.com/random.html):
 
-##### Resources
+> I recently needed to draw a f\*cking owl in R, so I decided to record the process as an experiment.
 
-##### <https://cfss.uchicago.edu/setup/git-with-rstudio/>
+#### Part I - Maintaining version control for code
+
+This workflow assumes that we are going to use to Git + Github to keep track of code changes.
+
+Resources: <https://cfss.uchicago.edu/setup/git-with-rstudio/>
 
 1)  Create a new project repository
 
-As a first step, I've followed the instructions above (I already have Git set up and linked to RStudio, and a Github account), and created a new repository that I titled reproducible-workflows. I then started a new project locally by cloning the repository, edited the read-me and pushed it back to check everything was working.
+As a first step, follow the instructions above (I already have Git set up and linked to RStudio, and a Github account), and create a new repository. I titled mine reproducible-workflows for this post. Then start a new project locally by cloning the repository, edit the read-me and push it back to check everything is working.
 
 2)  Create a new rmarkdown file, and add some code.
 
-This workflow assumes that we are going to use to Git to keep track of code changes. As an example, here is some simulated data from a fake study.
+Let's test it out using some simulated data from a fake study.
 
-#### Fake study report
+#### ------- Fake study report pt 1 - Benefits of petting dogs before exams -------
 
-Research has shown that spending time with a pet appeared to act as a buffer against psychological stress (Ratschen et al., 2020). Imagine that we conducted an experiment to explore whether this effect generalised to stress caused by university exams. Specifically, we hypothesised that spending time with a university health and wellbeing dog before an exam would reduce feelings of stress relative to those who only looked at pictures of dogs before an exam. In order to test the hypothesis we recruited 200 students who had imminent exams and declared that they felt stressed, and assigned half of them to pet the university dog, and half to look through a catalogue of dog pictures. We then assessed how stressed they felt on the Stress-o-metre Scale (1-100).
+A recent study suggested that spending time with a pet acts as a buffer against psychological stress (Ratschen et al., 2020). Imagine that we conducted an experiment to explore whether this effect generalised to stress caused by university exams. Specifically, we hypothesised that students who spent time with a university health and wellbeing dog before an exam would have fewer feelings of stress relative to students who only looked at pictures of dogs before an exam. In order to test the hypothesis we recruited 200 students who had imminent exams and self-reported that they felt stressed, and assigned half of them to pet the university dog, and half to look through a catalogue of dog pictures. We then assessed how stressed they felt on the Stress-o-metre Scale (1-100).
 
-For the purposes of this simulation, we have a simple between subjects design, where the independent (grouping) variable has two levels, and the dependent variable is from a normal distribution.
+```{r dog_images, echo=FALSE, fig.show='hold', fig.align='default', fig.cap="Study conditions"}
+library(cowplot)
+live_dog <- ggdraw() + 
+  draw_image("University-of-Lancashire-Guide-Dogs.jpg", width = .66)  + labs(x = "Condition A")
+
+book_dog <- ggdraw() + draw_image("Dog-catalogue.jpg") + labs(x = "Condition B")
+
+plot_grid(live_dog, book_dog, ncol = 2, labels = c("Dog condition", "Book condition"), label_y = .2)
+
+```
+
+(For the purposes of this simulation, we have a simple between subjects design, where the independent (grouping) variable has two levels, and the dependent variable is from a normal distribution.)
 
 ```{r ind-vars, echo = TRUE}
 #simulate normally distributed data for an independent samples t-test
@@ -73,35 +88,31 @@ hist(B_scores)
 
 I can now run my inferential test on my new data.
 
-```{r t-test1}
+```{r t-test1, eval=FALSE, include=FALSE}
 t.test(A_scores,B_scores)
 ```
 
-But we want to report the results from the statistical test in an inline report (i.e. a sentence), so we assign it to an object and extract the parameters we need in text:
+We want to report the results from the statistical test in an inline report (i.e. a sentence), so we assign it to an object and extract the parameters we need in text:
 
 ```{r t-test2}
 mod1 <- broom::tidy(t.test(A_scores,B_scores))
 ```
 
-A `` `r mod1$method` `` indicated that participants in condition A (*M* = `` `r mean(A_scores)` ``, *SD* = `` `r sd(A_scores)` ``) did [not] score significantly lower than participants in condition B (*M* = `` `r mean(B_scores)` ``, *SD* = `` `r  sd(B_scores)` ``), *t*(`` `r mod1$parameter` ``) = `` `r mod1$statistic` ``, *p* = `` `r mod1$p.value` ``.
+> A `r mod1$method` indicated that participants who pet dogs (*M* = `r round(mean(A_scores),2)`, *SD* = `r round(sd(A_scores),2)`) did [not] score significantly lower than participants who looked at pictures of dogs (*M* = `r round(mean(B_scores),2)`, *SD* = `r round(sd(B_scores),2)`), *t*(`r round(mod1$parameter,2)`) = `r round(mod1$statistic,2)`, *p* = `r round(mod1$p.value,2)`.
 
-This will print out as follows:
+(Note that we didn't set the seed, so the results may or may not be significant each time we render the document.)
 
-> A `r mod1$method` indicated that participants in condition A (*M* = `r mean(A_scores)`, *SD* = `r sd(A_scores)`) did [not] score significantly lower than participants in condition B (*M* =`r mean(B_scores)`, *SD* = `r sd(B_scores)`), *t*(`r mod1$parameter`) = `r mod1$statistic`, *p* = `r mod1$p.value`.
+Ratschen E, Shoesmith E, Shahab L, Silva K, Kale D, Toner P, et al. (2020) Human-animal relationships and interactions during the Covid-19 lockdown phase in the UK: Investigating links with mental health and loneliness. PLoS ONE 15(9): e0239397. [\<https://doi.org/10.1371/journal.pone.0239397\>](https://doi.org/10.1371/journal.pone.0239397){.uri}
 
-Unfortunately, the number of digits isn't helpful. The `round` function can help:
-
-> A `r mod1$method` indicated that participants in condition A (*M* = `r round(mean(A_scores),2)`, *SD* = `r round(sd(A_scores),2)`) did [not] score significantly lower than participants in condition B (*M* = `r round(mean(B_scores),2)`, *SD* = `r round(sd(B_scores),2)`), *t*(`r round(mod1$parameter,2)`) = `r round(mod1$statistic,2)`, *p* = `r round(mod1$p.value,2)`.
+#### ---- End of Fake study report pt 1 --------
 
 Once I have finished my analysis and pushed the changes, I am going to share these exciting results with my (imaginary) collaborators so that we can craft the discussion section of our paper together. This is where Part II of the reproducible, collaborative workflow and the `trackdown` package comes in.
 
-#### Part II
+#### Part II - Writing text collaboratively in Google Docs
 
-##### Resources
+Resources: <https://ekothe.github.io/trackdown/>
 
-The vignettes for the `trackdown` package can be found here: <https://ekothe.github.io/trackdown/>
-
-[Working in RStudio to create a new Google Doc]{.ul}
+[1) Working in RStudio to create a new Google Doc]{.ul}
 
 The `trackdown` package isn't on CRAN yet, and so needs to be installed directly:
 
@@ -157,11 +168,11 @@ After running this in the console, I am duly warned that downloading will overwr
 
 Having learned my lesson the hard way, I'll now copy back in the notes from my local copy that I have saved once I knew they would be overwritten, and knit the document to see what it looks like.
 
-To finish off, I'll add some more code, and push the latest version back to Github.
+To finish off, I'll add some more code in my fake study report, and push the latest version back to Github.
 
-#### Fake Study Report II
+#### -------- Fake Study Report pt 2 --------------------
 
-As can be seen in Figure 3, our results indicate that spending time petting the university health and well being dog did not significantly reduce stress relative to looking at pictures of dogs prior to an exam. The study will need to be replicated with other dogs as stimuli.
+As can be seen in Figure 3, our results indicate that spending time petting the university health and wellbeing dog did [not] significantly reduce stress relative to looking at pictures of dogs prior to an exam. The study will need to be replicated with other dogs as stimuli.
 
 ```{r wide dog, include=FALSE}
 #join scores in a tibble
@@ -183,23 +194,37 @@ stress_long <- pivot_longer(
 )
 ```
 
-*Figure 3.* Stress after either petting dog or looking at dog pictures
-
-```{r dog plot, echo=FALSE}
+```{r dog plot, fig.cap = "Figure 3: Stress after either petting dog or looking at dog pictures", echo=FALSE}
  papaja::apa_beeplot(stress_long
                      , dv = "Score"
                      , factors = "Condition"
                      , id = "user_id"
-                     , args_x_axis = list(labels = c("Pet Dog", "Dog Picture"))
+                     , args_x_axis = list(labels = c("Dog", "Book"))
                      , ylab = "Stress-O-Metre Score"
                        )
 
 ```
 
-### Comments
+#### -------- End Fake Study Report pt 2 --------------------
 
-The process works, but not painlessly. It will likely require some more "clued-up" collaborators, since the Google Doc contains all of the Markdown formatting. It might be better to render the document to another format for them to be able to see what it looks like. This is possible.
+Interestingly, the `trackdown` package has generated a folder with two Rds files. Given that I'm not sure when these are updated, I'll commit and push them as well.
+
+### General comments
+
+The process does seem to work, but not painlessly. The issue that will need to be considered is how to on-board collaborators. It will likely require some more "clued-up" collaborators, since the Google Doc contains all of the Markdown formatting, and the vignettes specify that any formatting applied in the Google Doc is not converted to markdown when downloaded (requiring the lead collaborator to enact any formatting changes manually).
+
+One option which I didn't try is to render the .Rmd document to another format and upload it alongside the Google Doc for collaborators to be able to see what a finished version of the text + figures/in-line reports. This is possible using the `path_output` argument of `upload_` and `update_file()`.
 
 A great feature would be the ability to compare the text of documents
 
-Ratschen E, Shoesmith E, Shahab L, Silva K, Kale D, Toner P, et al. (2020) Human-animal relationships and interactions during the Covid-19 lockdown phase in the UK: Investigating links with mental health and loneliness. PLoS ONE 15(9): e0239397. <https://doi.org/10.1371/journal.pone.0239397>
+At present, this workflow seems most suited to keeping track of my own work and versions. My most common use-case is where I am corresponding author on a manuscript that goes through several cycles of revisions, but doesn't have substantial changes to the figures or analyses. I have been trying to move to writing everything in `papaja` but then wind up with changes in the text in a rendered word document that I have to manually track back into the .Rmd. This is a major pain.
+
+Where this workflow might be less useful is in working with my PhDs as collaborators. Here I am often reviewing and writing code as well as text, and might need to follow both steps above for a project.
+
+Finally, I think this workflow can work with Papaja. A key might be to do most of the processing work in r scripts which are then called in via `source()` so as to minimise the code intrusions, and upload a rendered .docx file to look at the layout.
+
+## A more realistic example
+
+As noted above, I now most frequently start most projects using a Papaja template. So let's see how that would play out.
+
+Within the present project, I am now going to create a new Rmd from the Papaja manuscript template, and populate it with some details from my fake study.
