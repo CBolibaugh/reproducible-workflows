@@ -59,9 +59,9 @@ A recent study suggested that spending time with a pet acts as a buffer against 
 ```{r dog_images, echo=FALSE, fig.show='hold', fig.align='default', fig.cap="Study conditions"}
 library(cowplot)
 live_dog <- ggdraw() + 
-  draw_image("University-of-Lancashire-Guide-Dogs.jpg", width = .66)  + labs(x = "Condition A")
+  draw_image("images/University-of-Lancashire-Guide-Dogs.jpg", width = .66)  + labs(x = "Condition A")
 
-book_dog <- ggdraw() + draw_image("Dog-catalogue.jpg") + labs(x = "Condition B")
+book_dog <- ggdraw() + draw_image("images/Dog-catalogue.jpg") + labs(x = "Condition B")
 
 plot_grid(live_dog, book_dog, ncol = 2, labels = c("Dog condition", "Book condition"), label_y = .2)
 
@@ -288,3 +288,37 @@ Ok, I'm going to push all these changes to Github, and tomorrow come back to add
 4.  If there is a lot of data processing in the Rmd, the number of "hidden" code chunks in the Google Doc can start to be visually disorienting. Here a better practice is likely to be creating separate .Rmd or .R files for analyses that are sourced in the main Papaja .Rmd.
 
 5.  Think about how to initiate collaborators to this way of working. It might be worth creating a brief onboarding document that re-iterates the text `Trackdown` places at the start of the Google Doc to explain how to interact with it.
+
+6.  When working with a template like Papaja, include 3 separate chunks to use the `Trackdown` commands at the beginning or end of the manuscript. (I find it easier to keep them at the end.) All of these chunks should be set with options `eval = FALSE` and `include = FALSE` so they are not run when you knit the document. For this demonstration document, I've created the following three chunks (named `track-upload`, `track-update` and `track-download`) that I can run manually as needed:
+
+
+```{r track-upload, eval=FALSE,echo=TRUE}
+upload_file(file = "Benefits of petting dogs.Rmd",
+  gfile = NULL,
+  gpath = "trackdown",
+  shared_drive = NULL,
+  hide_code = TRUE,
+  path_output = "Benefits-of-petting-dogs.docx"
+)
+```
+
+   
+```{r track-update, eval=FALSE, echo=TRUE}
+trackdown::update_file(
+  file = "Benefits of petting dogs.Rmd",
+  gfile = NULL,
+  gpath = "trackdown",
+  shared_drive = NULL,
+  hide_code = TRUE,
+  path_output = "Benefits-of-petting-dogs.docx"
+)
+```
+```{r track-down, eval=FALSE, echo=TRUE}
+trackdown::download_file(
+  file = "Benefits of petting dogs.Rmd",
+  gfile = NULL, 
+  gpath = "trackdown", 
+  shared_drive = NULL)
+
+
+```

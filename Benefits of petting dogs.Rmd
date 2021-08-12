@@ -200,7 +200,7 @@ This is a poorly designed study with multiple confounds. In future research, the
 <div id="refs" custom-style="Bibliography"></div>
 \endgroup
 
-```{r track-uoload, eval=FALSE, include=FALSE}
+```{r track-upload, eval=FALSE, include=FALSE}
 # trackdown package to create google doc for collaboration
 
 upload_file(
