@@ -279,7 +279,7 @@ Ok, I'm going to push all these changes to Github, and tomorrow come back to add
 
 #### A few tips for collaborating in Google Docs
 
-1.  Make use of the `path output` parameter in the `upload-file()` and`update_file()` functions to upload the rendered and formatted Word document as well as the google doc version of the markdown formatted manuscript. This will enable collaborators to read through the document with figures, and in-line output in place.
+1.  Make use of the `path output` parameter in the `upload-file()` and`update_file()` functions to upload the rendered and formatted Word document as well as the google doc version of the markdown formatted manuscript. This will enable collaborators to read through the document with figures, and in-line output in place. (Make sure you have knit immediately before uploading!)
 
 2.  When sharing with collaborators on Google Drive, do not share the whole project folder content with the same permissions. Instead, share the output Word doc as "read only" to ensure that edits do not happen here, and share the Google Doc version of the Rmd with editing permissions.
 
