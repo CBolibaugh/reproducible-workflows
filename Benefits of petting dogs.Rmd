@@ -43,14 +43,15 @@ mask              : no
 draft             : no
 
 documentclass     : "apa6"
-classoption       : "man"
-output            : papaja::apa6_word
+classoption       : "jou"
+output            : papaja::apa6_docx
 ---
 
 ```{r setup, include = FALSE}
 library(cowplot)
 library("papaja")
 library(ggplot2)
+library(here)
 r_refs("r-references.bib")
 ```
 
@@ -77,9 +78,9 @@ We randomly assigned half of the participants to pet the university dog, and hal
 
 # create inline figures with 2 images
 live_dog <- ggdraw() + 
-  draw_image("University-of-Lancashire-Guide-Dogs.jpg", width = .66)  
+  draw_image(here("images", "University-of-Lancashire-Guide-Dogs.jpg"), width = .66)  
 
-book_dog <- ggdraw() + draw_image("Dog-catalogue.jpg") 
+book_dog <- ggdraw() + draw_image(here("images","Dog-catalogue.jpg") )
 
 conditions <- plot_grid(live_dog, book_dog, ncol = 2, labels = c("Live dog", "Dog pictures"), label_y = .2)
 
@@ -97,7 +98,7 @@ The distribution of scores of the Stress-o-Metre scale from the "Live Dog" and "
 
 
 
-```{r ind-vars, echo = TRUE}
+```{r ind-vars, echo=FALSE}
 ## (For the purposes of this simulation, we have a simple between subjects design, where the independent (grouping) variable has two levels, and the dependent variable is from a normal distribution.) ##
 
 # Simulate normally distributed data for an independent samples t-test
@@ -111,7 +112,7 @@ sigma1 <- 20 #population standard deviation of condition A?
 sigma2 <- 20 #population standard deviation of condition B?
 ```
 
-```{r ind-dat, echo=TRUE}
+```{r ind-dat, echo=FALSE}
 # Generate the scores using the `rnorm()` function, then plot the distribution of scores for each group.
 
 A_scores <- rnorm(n1,muA,sigma1) #simulate a vector of 100 deviates from normal distribution
@@ -119,14 +120,14 @@ B_scores <- rnorm(n2,muB,sigma2) #simulate a vector of 100 deviates from normal 
 ```
 
 ```{r histA, fig.cap = "Distribution of scores from Live dog condition"}
-hist(A_scores)
+hist(A_scores, main = "Live Dog condition", xlab = "Stress-O-Metre scores")
 ```
      
      
      
     
 ```{r histB, fig.cap = "Distribution of scores from Dog pictures condition"}
-hist(B_scores)
+hist(B_scores, main = "Dog Pictures condition", xlab = "Stress-O-Metre scores")
 ```
 
 We used `r cite_r("r-references.bib")` for all our analyses.
@@ -145,7 +146,7 @@ t.test(A_scores,B_scores)
 
 mod1 <- broom::tidy(t.test(A_scores,B_scores))
 ```
-A `r mod1$method` indicated that participants who pet dogs (*M* = `r round(mean(A_scores),2)`, *SD* = `r round(sd(A_scores),2)`) did [not] score significantly lower than participants who looked at pictures of dogs (*M* = `r round(mean(B_scores),2)`, *SD* = `r round(sd(B_scores),2)`), *t*(`r round(mod1$parameter,2)`) = `r round(mod1$statistic,2)`, *p* = `r round(mod1$p.value,2)`on the Stress-O-Metre Scale.
+A `r mod1$method` indicated that participants who pet dogs (*M* = `r round(mean(A_scores),2)`, *SD* = `r round(sd(A_scores),2)`) did [not] score significantly lower than participants who looked at pictures of dogs (*M* = `r round(mean(B_scores),2)`, *SD* = `r round(sd(B_scores),2)`), *t*(`r round(mod1$parameter,2)`) = `r round(mod1$statistic,2)`, *p* = `r round(mod1$p.value,2)` on the Stress-O-Metre Scale.
 
 # Discussion
 
@@ -177,7 +178,7 @@ upload_file(
 ```{r track-update, eval=FALSE, include=FALSE}
 # trackdown package to create google doc for collaboration
 
-update_file(
+trackdown::update_file(
   file = "Benefits of petting dogs.Rmd",
   gfile = NULL,
   gpath = "trackdown",
