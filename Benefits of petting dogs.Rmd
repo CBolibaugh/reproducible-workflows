@@ -52,6 +52,7 @@ library(cowplot)
 library("papaja")
 library(ggplot2)
 library(here)
+library(tidyverse)
 r_refs("r-references.bib")
 ```
 
@@ -130,6 +131,27 @@ hist(A_scores, main = "Live Dog condition", xlab = "Stress-O-Metre scores")
 hist(B_scores, main = "Dog Pictures condition", xlab = "Stress-O-Metre scores")
 ```
 
+```{r wide dog, include=FALSE}
+#join scores in a tibble
+stress_wide <- tibble(
+  pet_dog = A_scores,
+  pic_dog = B_scores
+)
+```
+
+```{r long dog, include=FALSE}
+#pivot to long format and add id
+stress_long <- pivot_longer(
+  data = stress_wide,
+  cols = c("pet_dog", "pic_dog"),
+  names_to = "Condition",
+  values_to = "Score"
+) %>% mutate(
+  user_id = paste0("S", seq(200))
+)
+```
+
+
 We used `r cite_r("r-references.bib")` for all our analyses.
 
 # Results
@@ -147,6 +169,21 @@ t.test(A_scores,B_scores)
 mod1 <- broom::tidy(t.test(A_scores,B_scores))
 ```
 A `r mod1$method` indicated that participants who pet dogs (*M* = `r round(mean(A_scores),2)`, *SD* = `r round(sd(A_scores),2)`) did [not] score significantly lower than participants who looked at pictures of dogs (*M* = `r round(mean(B_scores),2)`, *SD* = `r round(sd(B_scores),2)`), *t*(`r round(mod1$parameter,2)`) = `r round(mod1$statistic,2)`, *p* = `r round(mod1$p.value,2)` on the Stress-O-Metre Scale.
+
+These results can be seen in Figure 4.     
+
+
+```{r dog-plot, fig.cap = "Stress after petting dog or looking at dog pictures"}
+ papaja::apa_beeplot(stress_long
+                     , dv = "Score"
+                     , factors = "Condition"
+                     , id = "user_id"
+                     , args_x_axis = list(labels = c("Live Dog", "Dog Picture"))
+                     , ylab = "Stress-O-Metre Score"
+                       )
+
+```
+
 
 # Discussion
 
